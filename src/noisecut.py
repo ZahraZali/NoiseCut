@@ -8,19 +8,20 @@
 
 import numpy as np
 import librosa
-from obspy import read, Trace, Stream
+from obspy import Trace
 import librosa.display
 import matplotlib.pyplot as plt
 
 
-def noisecut(file, component, plotspec='no'):
+# def noisecut(file, component, plotspec='no'):
+
+def noisecut(trace, plotspec=False):
     '''
     Reduce noise from all the components of the OBS data using HPS noise
     reduction algorithms.
     '''
 
-    trace = read(file)
-    x = trace[component].data
+    x = trace.data
     y = x.astype(float)
 
     sr = 16000
@@ -91,96 +92,97 @@ def noisecut(file, component, plotspec='no'):
     z = x - new
     stats = trace[0].stats
     stats.location = 'NC'
-    st = Stream([Trace(data=z, header=stats)])
-    st.write(file+'-NoiseCut.mseed', format='MSEED', encoding=5, reclen=4096)
 
-    if plotspec == 'yes':
+    return Trace(data=z, header=stats)
 
-        file2 = ('D10.DO.HH4..D.2012.080.000000-NoiseCut.mseed')
-        trace2 = read(file2)
-        x2 = trace2[0].data
-        y2 = x2.astype(float)
-        Noisereduced = librosa.stft(
-            y2,
-            n_fft=n_fft,
-            hop_length=hop_length,
-            win_length=win_length)
 
-        fig = plt.figure(figsize=(18, 9))
-        plt.subplot(3, 2, 1)
-        librosa.display.specshow(
-            librosa.power_to_db(np.abs(S_full)), y_axis='log', sr=sr)
-        plt.title('Full spectrogram', fontsize=14)
-        plt.ylabel('Frequency (Hz)', fontsize=14)
-        freq = [0, 128, 512, 2048, 8000]
-        labelsy = [0, 0.8, 3.2, 12.8, 50]
-        plt.yticks(freq, labelsy, fontsize=14)
-        plt.clim(0, 80)
+def plot_noisecut(trace):
 
-        plt.subplot(3, 2, 3)
-        librosa.display.specshow(
-            librosa.power_to_db(np.abs(S_background)), sr=sr, y_axis='log')
-        plt.ylabel('Frequency (Hz)', fontsize=14)
-        plt.title('Noise spectrogram', fontsize=14)
-        freq = [0, 128, 512, 2048, 8000]
-        labelsy = [0, 0.8, 3.2, 12.8, 50]
-        labelsx = [0, 4, 8, 12, 16, 20, 24]
-        plt.yticks(freq, labelsy, fontsize=14)
-        plt.clim(0, 80)
+    x2 = trace.data
+    y2 = x2.astype(float)
+    Noisereduced = librosa.stft(
+        y2,
+        n_fft=n_fft,
+        hop_length=hop_length,
+        win_length=win_length)
 
-        plt.subplot(3, 2, 5)
-        librosa.display.specshow(
-            librosa.power_to_db(np.abs(Noisereduced)), sr=sr, y_axis='log')
-        plt.ylabel('Frequency (Hz)', fontsize=14)
-        plt.title('Noise reduced spectrogram', fontsize=14)
-        freq = [0, 128, 512, 2048, 8000]
-        labelsy = [0, 0.8, 3.2, 12.8, 50]
-        labelsx = [0, 4, 8, 12, 16, 20, 24]
-        plt.yticks(freq, labelsy, fontsize=14)
-        labelsx = [0, 4, 8, 12, 16, 20, 24]
-        plt.xticks(np.arange(0, 2110, 351.66), labelsx, fontsize=16)
-        plt.clim(0, 80)
+    fig = plt.figure(figsize=(18, 9))
+    plt.subplot(3, 2, 1)
+    librosa.display.specshow(
+        librosa.power_to_db(np.abs(S_full)), y_axis='log', sr=sr)
+    plt.title('Full spectrogram', fontsize=14)
+    plt.ylabel('Frequency (Hz)', fontsize=14)
+    freq = [0, 128, 512, 2048, 8000]
+    labelsy = [0, 0.8, 3.2, 12.8, 50]
+    plt.yticks(freq, labelsy, fontsize=14)
+    plt.clim(0, 80)
 
-        plt.subplot(3, 2, 2)
-        librosa.display.specshow(
-            librosa.power_to_db(np.abs(S_full)), sr=sr, y_axis='log')
-        plt.ylabel('Frequency (Hz)', fontsize=14)
-        plt.title('Full spectrogram', fontsize=14)
-        plt.ylim(0, 160)
-        freq = [0, 32, 64, 96, 128, 160]
-        labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
-        plt.yticks(freq, labelsy, fontsize=14)
-        plt.clim(0, 80)
+    plt.subplot(3, 2, 3)
+    librosa.display.specshow(
+        librosa.power_to_db(np.abs(S_background)), sr=sr, y_axis='log')
+    plt.ylabel('Frequency (Hz)', fontsize=14)
+    plt.title('Noise spectrogram', fontsize=14)
+    freq = [0, 128, 512, 2048, 8000]
+    labelsy = [0, 0.8, 3.2, 12.8, 50]
+    labelsx = [0, 4, 8, 12, 16, 20, 24]
+    plt.yticks(freq, labelsy, fontsize=14)
+    plt.clim(0, 80)
 
-        plt.subplot(3, 2, 4)
-        librosa.display.specshow(
-            librosa.power_to_db(np.abs(S_background)), sr=sr, y_axis='log')
-        plt.ylabel('Frequency (Hz)', fontsize=14)
-        plt.title('Noise spectrogram', fontsize=14)
-        plt.ylim(0, 160)
-        freq = [0, 32, 64, 96, 128, 160]
-        labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
-        plt.yticks(freq, labelsy, fontsize=14)
-        plt.clim(0, 80)
+    plt.subplot(3, 2, 5)
+    librosa.display.specshow(
+        librosa.power_to_db(np.abs(Noisereduced)), sr=sr, y_axis='log')
+    plt.ylabel('Frequency (Hz)', fontsize=14)
+    plt.title('Noise reduced spectrogram', fontsize=14)
+    freq = [0, 128, 512, 2048, 8000]
+    labelsy = [0, 0.8, 3.2, 12.8, 50]
+    labelsx = [0, 4, 8, 12, 16, 20, 24]
+    plt.yticks(freq, labelsy, fontsize=14)
+    labelsx = [0, 4, 8, 12, 16, 20, 24]
+    plt.xticks(np.arange(0, 2110, 351.66), labelsx, fontsize=16)
+    plt.clim(0, 80)
 
-        plt.subplot(3, 2, 6)
-        librosa.display.specshow(
-            librosa.power_to_db(np.abs(Noisereduced)), sr=sr, y_axis='log')
-        plt.ylabel('Frequency (Hz)', fontsize=14)
-        plt.title('Noise reduced spectrogram', fontsize=14)
-        plt.ylim(0, 160)
-        freq = [0, 32, 64, 96, 128, 160]
-        labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
-        plt.yticks(freq, labelsy, fontsize=14)
-        labelsx = [0, 4, 8, 12, 16, 20, 24]
-        plt.xticks(np.arange(0, 2110, 351.66), labelsx, fontsize=16)
-        plt.clim(0, 80)
+    plt.subplot(3, 2, 2)
+    librosa.display.specshow(
+        librosa.power_to_db(np.abs(S_full)), sr=sr, y_axis='log')
+    plt.ylabel('Frequency (Hz)', fontsize=14)
+    plt.title('Full spectrogram', fontsize=14)
+    plt.ylim(0, 160)
+    freq = [0, 32, 64, 96, 128, 160]
+    labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
+    plt.yticks(freq, labelsy, fontsize=14)
+    plt.clim(0, 80)
 
-        cb_ax = fig.add_axes([0.91, 0.12, 0.014, 0.76])
-        cbar = plt.colorbar(cax=cb_ax)
-        labelcl = ['0dB', '', '20dB', '', '40dB', '', '60dB', '', '80dB']
-        cbar.ax.set_yticklabels(labelcl, rotation=90)
-        cbar.ax.tick_params(labelsize=14)
+    plt.subplot(3, 2, 4)
+    librosa.display.specshow(
+        librosa.power_to_db(np.abs(S_background)), sr=sr, y_axis='log')
+    plt.ylabel('Frequency (Hz)', fontsize=14)
+    plt.title('Noise spectrogram', fontsize=14)
+    plt.ylim(0, 160)
+    freq = [0, 32, 64, 96, 128, 160]
+    labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
+    plt.yticks(freq, labelsy, fontsize=14)
+    plt.clim(0, 80)
 
-        fig.savefig(file+'-NoiseCut.png', dpi=100)
-        plt.close(fig)
+    plt.subplot(3, 2, 6)
+    librosa.display.specshow(
+        librosa.power_to_db(np.abs(Noisereduced)), sr=sr, y_axis='log')
+    plt.ylabel('Frequency (Hz)', fontsize=14)
+    plt.title('Noise reduced spectrogram', fontsize=14)
+    plt.ylim(0, 160)
+    freq = [0, 32, 64, 96, 128, 160]
+    labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
+    plt.yticks(freq, labelsy, fontsize=14)
+    labelsx = [0, 4, 8, 12, 16, 20, 24]
+    plt.xticks(np.arange(0, 2110, 351.66), labelsx, fontsize=16)
+    plt.clim(0, 80)
+
+    cb_ax = fig.add_axes([0.91, 0.12, 0.014, 0.76])
+    cbar = plt.colorbar(cax=cb_ax)
+    labelcl = ['0dB', '', '20dB', '', '40dB', '', '60dB', '', '80dB']
+    cbar.ax.set_yticklabels(labelcl, rotation=90)
+    cbar.ax.tick_params(labelsize=14)
+
+    #fig.savefig(file+'-NoiseCut.png', dpi=100)
+    plt.show()
+    plt.close(fig)
+
