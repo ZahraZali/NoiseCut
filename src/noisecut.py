@@ -24,13 +24,13 @@ def noisecut(trace, plotspec=False):
     x = trace.data
     y = x.astype(float)
 
-    if trace[0].stats.sampling_rate == 20:
+    if trace.stats.sampling_rate == 20:
         win_length = 4096
-    elif trace[0].stats.sampling_rate == 50:
+    elif trace.stats.sampling_rate == 50:
         win_length = 8192
-    elif trace[0].stats.sampling_rate == 100:
+    elif trace.stats.sampling_rate == 100:
         win_length = 16384
-    elif trace[0].stats.sampling_rate == 200:
+    elif trace.stats.sampling_rate == 200:
         win_length = 32768
 
     hop_length = int ((win_length) / 4)
@@ -43,8 +43,8 @@ def noisecut(trace, plotspec=False):
         hop_length=hop_length,
         win_length=win_length))
 
-    l1= math.floor ((0.1 * 0.5 * win_length) / (0.5 * trace[0].stats.sampling_rate)) 
-    l2= math.ceil ((1 * 0.5 * win_length)/ (0.5 * trace[0].stats.sampling_rate)) 
+    l1= math.floor ((0.1 * 0.5 * win_length) / (0.5 * trace.stats.sampling_rate)) 
+    l2= math.ceil ((1 * 0.5 * win_length)/ (0.5 * trace.stats.sampling_rate)) 
 
     S_full2 = np.zeros((S_full.shape[0], S_full.shape[1]))
     S_full2[l1:l2, :] = S_full[l1:l2, :]
@@ -71,7 +71,7 @@ def noisecut(trace, plotspec=False):
     mask_i = librosa.util.softmask(
         S_filter,
         margin_i * (S_full1 - S_filter),
-        power=power)
+        power= power)
 
     S_background = mask_i * S_full1
 
@@ -98,7 +98,7 @@ def noisecut(trace, plotspec=False):
         window='hann',
         length=L)
     z = x - new
-    stats = trace[0].stats
+    stats = trace.stats
     stats.location = 'NC'
 
     return Trace(data=z, header=stats)
@@ -192,6 +192,6 @@ def plot_noisecut(trace):
     cbar.ax.tick_params(labelsize=14)
 
     #fig.savefig(file+'-NoiseCut.png', dpi=100)
-    plt.show()
+    #plt.show()
     plt.close(fig)
 
