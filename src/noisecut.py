@@ -5,7 +5,7 @@
 # accompanying file `LICENSE`.
 # -----------------------------------------------------------------------------
 
-
+import math
 import numpy as np
 import librosa
 from obspy import Trace
@@ -24,10 +24,17 @@ def noisecut(trace, plotspec=False):
     x = trace.data
     y = x.astype(float)
 
-    sr = 16000
-    hop_length = 4096
-    win_length = 16384
-    n_fft = 16384
+    if trace[0].stats.sampling_rate == 20:
+        win_length = 4096
+    elif trace[0].stats.sampling_rate == 50:
+        win_length = 8192
+    elif trace[0].stats.sampling_rate == 100:
+        win_length = 16384
+    elif trace[0].stats.sampling_rate == 200:
+        win_length = 32768
+
+    hop_length = int ((win_length) / 4)
+    n_fft = win_length
 
     # Compute the spectrogram amplitude and phase
     S_full, phase = librosa.magphase(librosa.stft(
@@ -36,14 +43,15 @@ def noisecut(trace, plotspec=False):
         hop_length=hop_length,
         win_length=win_length))
 
-    # [0.1-0.5]Hz= 16-82
-    # 1Hz=164
-    S_full2 = np.zeros((8193, 2110))
-    S_full2[16:164, :] = S_full[16:164, :]
+    l1= math.floor ((0.1 * 0.5 * win_length) / (0.5 * trace[0].stats.sampling_rate)) 
+    l2= math.ceil ((1 * 0.5 * win_length)/ (0.5 * trace[0].stats.sampling_rate)) 
 
-    S_full1 = np.zeros((8193, 2110))
-    S_full1[:16, :] = S_full[:16, :]
-    S_full1[164:, :] = S_full[164:, :]
+    S_full2 = np.zeros((S_full.shape[0], S_full.shape[1]))
+    S_full2[l1:l2, :] = S_full[l1:l2, :]
+
+    S_full1 = np.zeros((S_full.shape[0], S_full.shape[1]))
+    S_full1[:l1, :] = S_full[:l1, :]
+    S_full1[l2:, :] = S_full[l2:, :]
 
     # We'll compare frames using cosine similarity, and aggregate similar
     # frames by taking their (per-frequency) median value.
@@ -97,7 +105,8 @@ def noisecut(trace, plotspec=False):
 
 
 def plot_noisecut(trace):
-
+    
+    sr = 16000
     x2 = trace.data
     y2 = x2.astype(float)
     Noisereduced = librosa.stft(
