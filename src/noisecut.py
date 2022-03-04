@@ -43,8 +43,8 @@ def noisecut(trace, plotspec=False):
         hop_length=hop_length,
         win_length=win_length))
 
-    l1= math.floor ((0.1 * 0.5 * win_length) / (0.5 * trace.stats.sampling_rate)) 
-    l2= math.ceil ((1 * 0.5 * win_length)/ (0.5 * trace.stats.sampling_rate)) 
+    l1= math.floor ((0.1  * win_length) / trace.stats.sampling_rate)
+    l2= math.ceil ((1 * win_length)/ trace.stats.sampling_rate) 
 
     S_full2 = np.zeros((S_full.shape[0], S_full.shape[1]))
     S_full2[l1:l2, :] = S_full[l1:l2, :]
