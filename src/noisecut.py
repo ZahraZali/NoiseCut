@@ -15,36 +15,77 @@ import matplotlib.pyplot as plt
 
 # def noisecut(file, component, plotspec='no'):
 
-def noisecut(trace, plotspec=False):
+def _next_pow2(n):
+    return int(round(2**np.ceil(np.log2(n))))
+
+
+def _valid_win_length_samples(win_length_samples, win_length, sampling_rate):
+    if win_length_samples is None and win_length is None:
+        # fully automatic window length
+        win_length_samples = _next_pow2(120*sampling_rate)
+
+    elif win_length_samples is None and win_length is not None:
+        win_length_samples = _next_pow2(win_length*sampling_rate)
+
+    elif win_length_samples is not None and win_length_samples is not None:
+        raise ValueError(
+            'Parameters win_length and win_length_samples are mutually '
+            'exclusive.')
+    elif win_length_samples is not None and win_length is None:
+        # check win_length_samples is a power of 2
+        win_length_samples = int(win_length_samples)
+        if win_length_samples != _next_pow2(win_length_samples):
+            raise ValueError(
+                'Parameter win_length_samples must be a power of 2.')
+
+    return win_length_samples
+
+
+def noisecut(
+        trace,
+        ret_spectrograms=False,
+        win_length_samples=None,
+        win_length=None):
     '''
     Reduce noise from all the components of the OBS data using HPS noise
     reduction algorithms.
+
+    :param win_length_samples:
+        Window length in samples. Must be a power of 2. Alternatively it can be
+        set with `win_length`.
+    :type win_length_samples:
+        int
+
+    :param win_length:
+        Window length [s]. Alternatively it can be set with
+        `win_length_samples`.
+    :type win_length:
+        float
+
+    :returns:
+        The HPS trace and the spectrograms of the original, noise, and hps
+        trace as well as an array with the frequencies.
+    :return_type:
+        tuple ``(hps_trace, (s_original, s_noise, s_hps, frequencies))``
     '''
 
-    x = trace.data
-    y = x.astype(float)
+    x = trace.data.astype(float)
 
-    if trace.stats.sampling_rate == 20:
-        win_length = 4096
-    elif trace.stats.sampling_rate == 50:
-        win_length = 8192
-    elif trace.stats.sampling_rate == 100:
-        win_length = 16384
-    elif trace.stats.sampling_rate == 200:
-        win_length = 32768
+    win_length_samples = _valid_win_length_samples(
+        win_length_samples, win_length, trace.stats.sampling_rate)
 
-    hop_length = int ((win_length) / 4)
-    n_fft = win_length
+    hop_length = win_length_samples // 4
+    n_fft = win_length_samples
 
     # Compute the spectrogram amplitude and phase
     S_full, phase = librosa.magphase(librosa.stft(
-        y,
+        x,
         n_fft=n_fft,
         hop_length=hop_length,
-        win_length=win_length))
+        win_length=win_length_samples))
 
-    l1= math.floor ((0.1  * win_length) / trace.stats.sampling_rate)
-    l2= math.ceil ((1 * win_length)/ trace.stats.sampling_rate) 
+    l1 = math.floor((0.1 * win_length_samples) / trace.stats.sampling_rate)
+    l2 = math.ceil((1 * win_length_samples) / trace.stats.sampling_rate)
 
     S_full2 = np.zeros((S_full.shape[0], S_full.shape[1]))
     S_full2[l1:l2, :] = S_full[l1:l2, :]
@@ -71,7 +112,7 @@ def noisecut(trace, plotspec=False):
     mask_i = librosa.util.softmask(
         S_filter,
         margin_i * (S_full1 - S_filter),
-        power= power)
+        power=power)
 
     S_background = mask_i * S_full1
 
@@ -87,36 +128,56 @@ def noisecut(trace, plotspec=False):
         kernel_size=80,
         margin=5)
 
-    S_background = S_background+D_harmonic
+    S_background = S_background + D_harmonic
 
-    f = S_background*phase
+    f = S_background * phase
     L = x.shape[0]
     new = librosa.istft(
         f,
         hop_length=hop_length,
-        win_length=win_length,
+        win_length=win_length_samples,
         window='hann',
         length=L)
+
     z = x - new
     stats = trace.stats
     stats.location = 'NC'
 
-    return Trace(data=z, header=stats)
+    hps_trace = Trace(data=z, header=stats)
+
+    if ret_spectrograms:
+        # S_hps = librosa.stft(
+        #     z,
+        #     n_fft=n_fft,
+        #     hop_length=hop_length,
+        #     win_length=win_length_samples)
+
+        S_hps = S_full - S_background
+
+        df = trace.stats.sampling_rate/win_length_samples
+        frequencies = np.arange(S_hps.shape[0]) * df
+        times = np.arange(S_hps.shape[1]) * hop_length
+
+        return hps_trace, (S_full, S_background, S_hps, frequencies, times)
+    else:
+        return hps_trace
 
 
-def plot_noisecut(trace):
-    
+def power_to_db(spec):
+    # TODO return spec
+    return spec
+
+
+def plot_noisecut_spectrograms(
+        S_full, S_background, S_hps, frequencies, times):
+
     sr = 16000
-    x2 = trace.data
-    y2 = x2.astype(float)
-    Noisereduced = librosa.stft(
-        y2,
-        n_fft=n_fft,
-        hop_length=hop_length,
-        win_length=win_length)
 
     fig = plt.figure(figsize=(18, 9))
-    plt.subplot(3, 2, 1)
+    axes = plt.subplot(3, 2, 1)
+
+    axes.pcolormesh(times, frequencies, power_to_db(np.abs(S_full)))
+
     librosa.display.specshow(
         librosa.power_to_db(np.abs(S_full)), y_axis='log', sr=sr)
     plt.title('Full spectrogram', fontsize=14)
@@ -139,7 +200,7 @@ def plot_noisecut(trace):
 
     plt.subplot(3, 2, 5)
     librosa.display.specshow(
-        librosa.power_to_db(np.abs(Noisereduced)), sr=sr, y_axis='log')
+        librosa.power_to_db(np.abs(S_hps)), sr=sr, y_axis='log')
     plt.ylabel('Frequency (Hz)', fontsize=14)
     plt.title('Noise reduced spectrogram', fontsize=14)
     freq = [0, 128, 512, 2048, 8000]
@@ -174,7 +235,7 @@ def plot_noisecut(trace):
 
     plt.subplot(3, 2, 6)
     librosa.display.specshow(
-        librosa.power_to_db(np.abs(Noisereduced)), sr=sr, y_axis='log')
+        librosa.power_to_db(np.abs(S_hps)), sr=sr, y_axis='log')
     plt.ylabel('Frequency (Hz)', fontsize=14)
     plt.title('Noise reduced spectrogram', fontsize=14)
     plt.ylim(0, 160)
@@ -191,7 +252,10 @@ def plot_noisecut(trace):
     cbar.ax.set_yticklabels(labelcl, rotation=90)
     cbar.ax.tick_params(labelsize=14)
 
-    #fig.savefig(file+'-NoiseCut.png', dpi=100)
-    #plt.show()
+    # fig.savefig(file+'-NoiseCut.png', dpi=100)
+    # plt.show()
     plt.close(fig)
 
+
+hps_trace, spectrograms = noisecut(...)
+plot_noisecut_spectrograms(*spectrograms)
