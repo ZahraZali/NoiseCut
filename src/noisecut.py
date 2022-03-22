@@ -166,96 +166,53 @@ def noisecut(
 def power_to_db(spec):
     # TODO return spec
     return spec
+def power_to_db(S, amin=1e-16, top_db=80.0):
+    """Convert a power-spectrogram (magnitude squared) to decibel (dB) units.
+    Computes the scaling ``10 * log10(S / max(S))`` in a numerically
+    stable way.
+    """
+    def _tf_log10(x):
+        numerator = tf.math.log(x)
+        denominator = tf.math.log(tf.constant(10, dtype=numerator.dtype))
+        return numerator / denominator
+    
+    # Scale magnitude relative to maximum value in S. Zeros in the output 
+    # correspond to positions where S == ref.
+    ref = tf.reduce_max(S)
+
+    log_spec = 10.0 * _tf_log10(tf.maximum(amin, S))
+    log_spec -= 10.0 * _tf_log10(tf.maximum(amin, ref))
+
+    log_spec = tf.maximum(log_spec, tf.reduce_max(log_spec) - top_db)
+
+    return log_spec
 
 
 def plot_noisecut_spectrograms(
         S_full, S_background, S_hps, frequencies, times):
 
-    sr = 16000
+    fig = plt.figure(figsize=(16, 9))
+    axes = plt.subplot(3, 1, 3)
 
-    fig = plt.figure(figsize=(18, 9))
-    axes = plt.subplot(3, 2, 1)
-
+    plt.subplot(3, 1, 1)
     axes.pcolormesh(times, frequencies, power_to_db(np.abs(S_full)))
-
-    librosa.display.specshow(
-        librosa.power_to_db(np.abs(S_full)), y_axis='log', sr=sr)
     plt.title('Full spectrogram', fontsize=14)
     plt.ylabel('Frequency (Hz)', fontsize=14)
-    freq = [0, 128, 512, 2048, 8000]
-    labelsy = [0, 0.8, 3.2, 12.8, 50]
-    plt.yticks(freq, labelsy, fontsize=14)
-    plt.clim(0, 80)
-
-    plt.subplot(3, 2, 3)
-    librosa.display.specshow(
-        librosa.power_to_db(np.abs(S_background)), sr=sr, y_axis='log')
+    plt.colorbar()
+    
+    plt.subplot(3, 1, 2)
+    axes.pcolormesh(times, frequencies, power_to_db(np.abs(S_background)))
     plt.ylabel('Frequency (Hz)', fontsize=14)
     plt.title('Noise spectrogram', fontsize=14)
-    freq = [0, 128, 512, 2048, 8000]
-    labelsy = [0, 0.8, 3.2, 12.8, 50]
-    labelsx = [0, 4, 8, 12, 16, 20, 24]
-    plt.yticks(freq, labelsy, fontsize=14)
-    plt.clim(0, 80)
-
-    plt.subplot(3, 2, 5)
-    librosa.display.specshow(
-        librosa.power_to_db(np.abs(S_hps)), sr=sr, y_axis='log')
+    plt.colorbar()
+    
+    plt.subplot(3, 1, 3)
+    axes.pcolormesh(times, frequencies, power_to_db(np.abs(S_hps)))
     plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.title('Noise reduced spectrogram', fontsize=14)
-    freq = [0, 128, 512, 2048, 8000]
-    labelsy = [0, 0.8, 3.2, 12.8, 50]
-    labelsx = [0, 4, 8, 12, 16, 20, 24]
-    plt.yticks(freq, labelsy, fontsize=14)
-    labelsx = [0, 4, 8, 12, 16, 20, 24]
-    plt.xticks(np.arange(0, 2110, 351.66), labelsx, fontsize=16)
-    plt.clim(0, 80)
-
-    plt.subplot(3, 2, 2)
-    librosa.display.specshow(
-        librosa.power_to_db(np.abs(S_full)), sr=sr, y_axis='log')
-    plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.title('Full spectrogram', fontsize=14)
-    plt.ylim(0, 160)
-    freq = [0, 32, 64, 96, 128, 160]
-    labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
-    plt.yticks(freq, labelsy, fontsize=14)
-    plt.clim(0, 80)
-
-    plt.subplot(3, 2, 4)
-    librosa.display.specshow(
-        librosa.power_to_db(np.abs(S_background)), sr=sr, y_axis='log')
-    plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.title('Noise spectrogram', fontsize=14)
-    plt.ylim(0, 160)
-    freq = [0, 32, 64, 96, 128, 160]
-    labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
-    plt.yticks(freq, labelsy, fontsize=14)
-    plt.clim(0, 80)
-
-    plt.subplot(3, 2, 6)
-    librosa.display.specshow(
-        librosa.power_to_db(np.abs(S_hps)), sr=sr, y_axis='log')
-    plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.title('Noise reduced spectrogram', fontsize=14)
-    plt.ylim(0, 160)
-    freq = [0, 32, 64, 96, 128, 160]
-    labelsy = [0, 0.2, 0.4, 0.6, 0.8, 1]
-    plt.yticks(freq, labelsy, fontsize=14)
-    labelsx = [0, 4, 8, 12, 16, 20, 24]
-    plt.xticks(np.arange(0, 2110, 351.66), labelsx, fontsize=16)
-    plt.clim(0, 80)
-
-    cb_ax = fig.add_axes([0.91, 0.12, 0.014, 0.76])
-    cbar = plt.colorbar(cax=cb_ax)
-    labelcl = ['0dB', '', '20dB', '', '40dB', '', '60dB', '', '80dB']
-    cbar.ax.set_yticklabels(labelcl, rotation=90)
-    cbar.ax.tick_params(labelsize=14)
-
-    # fig.savefig(file+'-NoiseCut.png', dpi=100)
-    # plt.show()
+    plt.title('Nenoised spectrogram', fontsize=14)
+    plt.colorbar()
+    
     plt.close(fig)
-
 
 hps_trace, spectrograms = noisecut(...)
 plot_noisecut_spectrograms(*spectrograms)
