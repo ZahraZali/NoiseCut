@@ -1,14 +1,11 @@
-
-def test_noisecut():
-
-    component = 0
-    stream = read(file)
-    trace = stream[component]
-    
-    filtered_trace, spectrogram = noisecut(trace, plotspec=True)
+import noisecut
+import obspy
 
 
-    plot(filtered_trace, spectrogram)
+st= obspy.read('D10.DO.HH4..D.2012.080.000000')
+hps_trace, spectrograms = noisecut.noisecut (st[0], ret_spectrograms= True)
+noisecut.plot_noisecut_spectrograms (*spectrograms)
+
 
 
 

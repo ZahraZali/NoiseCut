@@ -13,7 +13,6 @@ import librosa.display
 import matplotlib.pyplot as plt
 
 
-# def noisecut(file, component, plotspec='no'):
 
 def _next_pow2(n):
     return int(round(2**np.ceil(np.log2(n))))
@@ -87,9 +86,11 @@ def noisecut(
     l1 = math.floor((0.1 * win_length_samples) / trace.stats.sampling_rate)
     l2 = math.ceil((1 * win_length_samples) / trace.stats.sampling_rate)
 
+    # We consider the frequency range out of the [0.1-1] Hz for the first step
     S_full2 = np.zeros((S_full.shape[0], S_full.shape[1]))
     S_full2[l1:l2, :] = S_full[l1:l2, :]
 
+    # We consider the frequency range of [0.1-1] Hz for the second step
     S_full1 = np.zeros((S_full.shape[0], S_full.shape[1]))
     S_full1[:l1, :] = S_full[:l1, :]
     S_full1[l2:, :] = S_full[l2:, :]
@@ -104,7 +105,6 @@ def noisecut(
     # The output of the filter shouldn't be greater than the input
     S_filter = np.minimum(np.abs(S_full1), np.abs(S_filter))
     margin_i = 1
-    # margin_v = 1,
     power = 2
 
     # Once we have the masks, simply multiply them with the input spectrogram
@@ -116,13 +116,7 @@ def noisecut(
 
     S_background = mask_i * S_full1
 
-    # mask_v = librosa.util.softmask(
-    #     S_full1 - S_filter,
-    #     margin_v * S_filter,
-    #     power=power)
-
-    # S_foreground = mask_v * S_full1
-
+    # In the second step we apply a median filter 
     D_harmonic, D_percussive = librosa.decompose.hpss(
         S_full2,
         kernel_size=80,
@@ -144,13 +138,9 @@ def noisecut(
     stats.location = 'NC'
 
     hps_trace = Trace(data=z, header=stats)
+    hps_trace.write( 'NoiseCut.mseed', format='MSEED', encoding=5, reclen=4096)
 
     if ret_spectrograms:
-        # S_hps = librosa.stft(
-        #     z,
-        #     n_fft=n_fft,
-        #     hop_length=hop_length,
-        #     win_length=win_length_samples)
 
         S_hps = S_full - S_background
 
@@ -163,56 +153,43 @@ def noisecut(
         return hps_trace
 
 
-def power_to_db(spec):
-    # TODO return spec
-    return spec
-def power_to_db(S, amin=1e-16, top_db=80.0):
-    """Convert a power-spectrogram (magnitude squared) to decibel (dB) units.
-    Computes the scaling ``10 * log10(S / max(S))`` in a numerically
-    stable way.
-    """
-    def _tf_log10(x):
-        numerator = tf.math.log(x)
-        denominator = tf.math.log(tf.constant(10, dtype=numerator.dtype))
-        return numerator / denominator
-    
-    # Scale magnitude relative to maximum value in S. Zeros in the output 
-    # correspond to positions where S == ref.
-    ref = tf.reduce_max(S)
-
-    log_spec = 10.0 * _tf_log10(tf.maximum(amin, S))
-    log_spec -= 10.0 * _tf_log10(tf.maximum(amin, ref))
-
-    log_spec = tf.maximum(log_spec, tf.reduce_max(log_spec) - top_db)
-
-    return log_spec
-
 
 def plot_noisecut_spectrograms(
         S_full, S_background, S_hps, frequencies, times):
 
-    fig = plt.figure(figsize=(16, 9))
-    axes = plt.subplot(3, 1, 3)
+    fig= plt.figure(figsize=(15, 9))
 
-    plt.subplot(3, 1, 1)
-    axes.pcolormesh(times, frequencies, power_to_db(np.abs(S_full)))
+    axs=fig.add_subplot(311)
+    pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_full)), cmap = 'magma', shading= 'auto')
+    plt.ylim(0,1)
     plt.title('Full spectrogram', fontsize=14)
     plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.colorbar()
+    plt.yticks (fontsize= 14)
+    axs.set_xticks([])
+    cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
+    cbar.ax.tick_params(labelsize=14) 
     
-    plt.subplot(3, 1, 2)
-    axes.pcolormesh(times, frequencies, power_to_db(np.abs(S_background)))
-    plt.ylabel('Frequency (Hz)', fontsize=14)
+    axs=fig.add_subplot(312)
+    pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_background)), cmap = 'magma', shading= 'auto')
+    plt.ylim(0,1)
     plt.title('Noise spectrogram', fontsize=14)
-    plt.colorbar()
-    
-    plt.subplot(3, 1, 3)
-    axes.pcolormesh(times, frequencies, power_to_db(np.abs(S_hps)))
     plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.title('Nenoised spectrogram', fontsize=14)
-    plt.colorbar()
+    plt.yticks (fontsize= 14)
+    axs.set_xticks([])
+    cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
+    cbar.ax.tick_params(labelsize=14)
     
+    axs=fig.add_subplot(313)
+    pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_hps)), cmap = 'magma', shading= 'auto')
+    plt.ylim(0,1)
+    plt.title('Denoised spectrogram', fontsize=14)
+    plt.ylabel('Frequency (Hz)', fontsize=14)
+    plt.yticks (fontsize= 14)
+    cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
+    cbar.ax.tick_params(labelsize=14) 
+    labelsx = [0,4,8,12,16,20,24]
+    plt.xticks(np.arange(0,times[-1],(times[-1]/6)-1), labelsx, fontsize= 14)
+    
+    fig.savefig ('NoiseCut spectrograms.png', dpi=100)
+    plt.show()
     plt.close(fig)
-
-hps_trace, spectrograms = noisecut(...)
-plot_noisecut_spectrograms(*spectrograms)

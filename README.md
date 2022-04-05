@@ -18,4 +18,4 @@ NoiseCut is licenced under the [GNU Affero General Public License
 
 ## Contact
 
-* Package maintainer: 
+* Package maintainer: Zahra Zali, zali@uni-potsdam.de
