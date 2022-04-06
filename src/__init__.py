@@ -6,3 +6,5 @@
 #
 # The NoiseCut Developers, 21st century
 # -----------------------------------------------------------------------------
+
+from .noisecut import *  # noqa
