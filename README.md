@@ -7,10 +7,6 @@ separation algorithms
 Find documentation and installation instructions in [NoiseCut's documentation
 preview](https://NoiseCut.org/doc).
 
-## Contributing
-
-Please see the file [`CONTRIBUTING.md`](CONTRIBUTING.md).
-
 ## Licence
 
 NoiseCut is licenced under the [GNU Affero General Public License
