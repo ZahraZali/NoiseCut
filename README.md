@@ -16,8 +16,7 @@ noisecut.plot_noisecut_spectrograms(*spectrograms)
 
 ## Installation
 
-Find installation instructions in [NoiseCut's documentation
-preview](https://NoiseCut.org/doc).
+For the installation you need to clone the repository. Then run "python setup.py install" in the terminal. 
 
 ## Licence
 
