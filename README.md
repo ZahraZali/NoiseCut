@@ -5,6 +5,7 @@ separation algorithms
 ## Example of one day OBS signal
 
 import noisecut
+
 import obspy
 
 st = obspy.read('D10.DO.HH4..D.2012.080.000000')
