@@ -10,7 +10,7 @@ preview](https://NoiseCut.org/doc).
 ## Licence
 
 NoiseCut is licenced under the [GNU Affero General Public License
-(AGPLv3)](LICENCE).
+(AGPLv3)](LICENSE).
 
 ## Contact
 
