@@ -17,6 +17,7 @@ noisecut.plot_noisecut_spectrograms(*spectrograms)
 ## Installation
 
 For the installation you need to clone the repository. Then run "python setup.py install" in the terminal. 
+You need the Numpy version of 2.21.
 
 ## Licence
 
