@@ -3,6 +3,7 @@ OBS noise reduction from horizontal and vertical components using harmonic-percu
 separation algorithms
 
 ## Example of one day OBS signal
+After installing the package, in order to denoise a signal you can use the following code. The outputs are the denoised signal and the spectrogram as below.
 
 import noisecut                                                                                                                                                          
 import obspy
