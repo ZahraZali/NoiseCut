@@ -14,7 +14,7 @@ Please see the file [`CONTRIBUTING.md`](CONTRIBUTING.md).
 ## Licence
 
 NoiseCut is licenced under the [GNU Affero General Public License
-(AGPLv3)](LICENCE).
+(AGPLv3)](LICENSE).
 
 ## Contact
 
