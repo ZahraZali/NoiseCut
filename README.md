@@ -1,4 +1,6 @@
 # NoiseCut
+[![DOI](https://zenodo.org/badge/478924343.svg)](https://zenodo.org/badge/latestdoi/478924343)
+
 OBS noise reduction from horizontal and vertical components using harmonic-percussive
 separation algorithms
 
