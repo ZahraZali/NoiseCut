@@ -2,12 +2,12 @@
 [![DOI](https://zenodo.org/badge/478924343.svg)](https://zenodo.org/badge/latestdoi/478924343)
 
 NoiseCut is a Python package for denoising seismic records. It is specifically developed for noise reduction of Ocean Bottom Seismometer (OBS) data from both horizontal and vertical components, however, it is able to separate long-lasting narrowband signals from different kinds of data. It works based on harmonic-percussive
-separation algorithms (Zali et al., 2021).
+separation algorithms (Zali et al., 2021 & Zali et al., 2023).
 
 ## Links
 Paper: https://doi.org/10.5194/se-14-181-2023
 
-## Example of one day OBS signal
+## Example of NoiseCut application
 After installing the package, in order to denoise a signal you can use the following code. The outputs are the denoised signal and the spectrogram as below.The spectrogram shows only the frequency range of [0-1] Hz.
 
 import noisecut                                                                                                                                                          
