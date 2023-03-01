@@ -31,4 +31,4 @@ NoiseCut is licenced under the [GNU Affero General Public License
 
 ## Contact
 
-* Author: Zahra Zali, zali@uni-potsdam.de
+* Developer: Zahra Zali, zali@uni-potsdam.de
