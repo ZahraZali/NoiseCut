@@ -13,7 +13,7 @@ After installing the package, in order to denoise a signal you can use the follo
 import noisecut                                                                                                                                                          
 import obspy
 
-st = obspy.read('D10.DO.HH4..D.2012.080.000000')                                                                                       
+st = obspy.read('file_name')                                                                                       
 hps_trace, spectrograms = noisecut.noisecut(st[0], ret_spectrograms=True)                                                  
 noisecut.plot_noisecut_spectrograms(*spectrograms)
 
