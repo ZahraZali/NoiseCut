@@ -8,7 +8,7 @@ separation algorithms (Zali et al., 2021 & Zali et al., 2023).
 Paper: https://se.copernicus.org/articles/14/181/2023/se-14-181-2023.pdf
 
 ## Example of NoiseCut application
-After installing the package, in order to denoise a signal you can use the following code. The outputs are the denoised signal and the spectrogram as below.The spectrogram shows only the frequency range of [0-1] Hz.
+After installing the package, in order to denoise a signal you can use the following code. The outputs are the denoised signal and the spectrogram as below. The spectrogram shows frequency range of [0-1] Hz.
 
 import noisecut                                                                                                                                                          
 import obspy
