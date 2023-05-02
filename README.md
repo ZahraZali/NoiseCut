@@ -1,16 +1,16 @@
 # NoiseCut
 [![DOI](https://zenodo.org/badge/478924343.svg)](https://zenodo.org/badge/latestdoi/478924343)
 
-NoiseCut is a Python package for denoising seismic records. It is specifically developed for noise reduction of Ocean Bottom Seismometer (OBS) data from both horizontal and vertical components, however, it is able to separate long-lasting narrowband signals from different kinds of data. It works based on harmonic-percussive
-separation algorithms (Zali et al., 2021 & Zali et al., 2023).
+NoiseCut is a Python package for denoising seismic records and specializes in denoising Ocean Bottom Seismometer (OBS) data. It effectively separates long-lasting narrowband signals from broadband transients using harmonic-percussive separation algorithms (Zali et al., 2021 & Zali et al., 2023). The advantage of NoiseCut is that it preserves the earthquake signal with its entire frequency and amplitude after denoising.
 
 ## Links
 Paper: https://se.copernicus.org/articles/14/181/2023/se-14-181-2023.pdf
+Paper: https://pubs.geoscienceworld.org/ssa/srl/article/92/6/3668/606262/Volcanic-Tremor-Extraction-and-Earthquake
 
 ## Example of NoiseCut application
-After installing the package, in order to denoise a signal you can use the following code. The outputs are the denoised signal and the spectrogram as below. The spectrogram shows frequency range of [0-1] Hz.
+After installing the package to denoise a signal, you can use the following code. Outputs are the denoised signal and a figure showing the spectrogram of the input signal, the separated noise, and the denoised signal in the frequency range of [0-1] Hz.
 
-import noisecut                                                                                                                                                          
+import noisecut                                                                                                                                                         
 import obspy
 
 st = obspy.read('file_name')                                                                                       
