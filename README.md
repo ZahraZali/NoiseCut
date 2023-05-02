@@ -5,6 +5,7 @@ NoiseCut is a Python package for denoising seismic records and specializes in de
 
 ## Links
 Paper: https://se.copernicus.org/articles/14/181/2023/se-14-181-2023.pdf
+
 Paper: https://pubs.geoscienceworld.org/ssa/srl/article/92/6/3668/606262/Volcanic-Tremor-Extraction-and-Earthquake
 
 ## Example of NoiseCut application
