@@ -3,6 +3,8 @@
 
 NoiseCut is a Python package for denoising seismic records and specializes in denoising Ocean Bottom Seismometer (OBS) data. It effectively separates long-lasting narrowband signals from broadband transients using harmonic-percussive separation algorithms (Zali et al., 2021 & Zali et al., 2023). The advantage of NoiseCut is that it preserves the earthquake signal with its entire frequency and amplitude after denoising.
 
+![example](https://user-images.githubusercontent.com/50201021/235639292-481ee431-47d5-4ab7-8fd2-d07fc516e771.png)
+
 ## Links
 Paper: https://se.copernicus.org/articles/14/181/2023/se-14-181-2023.pdf
 
@@ -17,8 +19,6 @@ import obspy
 st = obspy.read('file_name')                                                                                       
 hps_trace, spectrograms = noisecut.noisecut(st[0], ret_spectrograms=True)                                                  
 noisecut.plot_noisecut_spectrograms(*spectrograms)
-
-![example](https://user-images.githubusercontent.com/50201021/235639292-481ee431-47d5-4ab7-8fd2-d07fc516e771.png)
 
 
 ## Installation instructions
