@@ -18,7 +18,7 @@ st = obspy.read('file_name')
 hps_trace, spectrograms = noisecut.noisecut(st[0], ret_spectrograms=True)                                                  
 noisecut.plot_noisecut_spectrograms(*spectrograms)
 
-![network architecture](Example-spectrograms.png)![example](https://user-images.githubusercontent.com/50201021/235639292-481ee431-47d5-4ab7-8fd2-d07fc516e771.png)
+[example](https://user-images.githubusercontent.com/50201021/235639292-481ee431-47d5-4ab7-8fd2-d07fc516e771.png)
 
 
 ## Installation instructions
