@@ -27,7 +27,7 @@ noisecut.plot_noisecut_spectrograms(*spectrograms)
 
 You can clone the public repository:
 ```
-git clone git://github.com/ZahraZali/NoiseCut
+git clone https://github.com/ZahraZali/NoiseCut
 ```
 Once you have a copy of the source, you can cd to NoiseCut directory and install it with:
 ```
