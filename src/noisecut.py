@@ -155,41 +155,43 @@ def noisecut(
 
 
 def plot_noisecut_spectrograms(
-        S_full, S_background, S_hps, frequencies, times):
+        S_full, S_background, S_hps, frequencies, times, fig=None):
+    
+    show = False
+    if fig is None:
+        fig= plt.figure(figsize=(15, 9))
 
-    fig= plt.figure(figsize=(15, 9))
-
-    axs=fig.add_subplot(311)
-    pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_full)), cmap = 'magma', shading= 'auto')
-    plt.ylim(0,1)
-    plt.title('Full spectrogram', fontsize=14)
-    plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.yticks (fontsize= 14)
-    axs.set_xticks([])
-    cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
-    cbar.ax.tick_params(labelsize=14) 
+        axs=fig.add_subplot(311)
+        pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_full)), cmap = 'magma', shading= 'auto')
+        plt.ylim(0,1)
+        plt.title('Full spectrogram', fontsize=14)
+        plt.ylabel('Frequency (Hz)', fontsize=14)
+        plt.yticks (fontsize= 14)
+        axs.set_xticks([])
+        cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
+        cbar.ax.tick_params(labelsize=14) 
     
-    axs=fig.add_subplot(312)
-    pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_background)), cmap = 'magma', shading= 'auto')
-    plt.ylim(0,1)
-    plt.title('Noise spectrogram', fontsize=14)
-    plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.yticks (fontsize= 14)
-    axs.set_xticks([])
-    cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
-    cbar.ax.tick_params(labelsize=14)
+        axs=fig.add_subplot(312)
+        pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_background)), cmap = 'magma', shading= 'auto')
+        plt.ylim(0,1)
+        plt.title('Noise spectrogram', fontsize=14)
+        plt.ylabel('Frequency (Hz)', fontsize=14)
+        plt.yticks (fontsize= 14)
+        axs.set_xticks([])
+        cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
+        cbar.ax.tick_params(labelsize=14)
     
-    axs=fig.add_subplot(313)
-    pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_hps)), cmap = 'magma', shading= 'auto')
-    plt.ylim(0,1)
-    plt.title('Denoised spectrogram', fontsize=14)
-    plt.ylabel('Frequency (Hz)', fontsize=14)
-    plt.yticks (fontsize= 14)
-    cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
-    cbar.ax.tick_params(labelsize=14) 
-    labelsx = [0,4,8,12,16,20,24]
-    plt.xticks(np.arange(0,times[-1],(times[-1]/6)-1), labelsx, fontsize= 14)
-    
-    fig.savefig ('NoiseCut spectrograms.png', dpi=100)
-    plt.show()
-    plt.close(fig)
+        axs=fig.add_subplot(313)
+        pcm=axs.pcolormesh(times, frequencies, librosa.power_to_db(np.abs(S_hps)), cmap = 'magma', shading= 'auto')
+        plt.ylim(0,1)
+        plt.title('Denoised spectrogram', fontsize=14)
+        plt.ylabel('Frequency (Hz)', fontsize=14)
+        plt.yticks (fontsize= 14)
+        cbar=fig.colorbar(pcm, ax=axs, pad= 0.01)
+        cbar.ax.tick_params(labelsize=14) 
+        labelsx = [0,4,8,12,16,20,24]
+        plt.xticks(np.arange(0,times[-1],(times[-1]/6)-1), labelsx, fontsize= 14)
+        
+        plt.tight_layout()
+        fig.savefig ('NoiseCut spectrograms.png', dpi=100)
+        plt.close(fig)
