@@ -33,7 +33,7 @@ Once you have a copy of the source, you can cd to NoiseCut directory and install
 ```
 python setup.py install
 ```
-You need the Numpy version of 1.21.
+You need the Numpy version < 1.21.
 
 ## Licence
 
