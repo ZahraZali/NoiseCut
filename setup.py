@@ -11,7 +11,7 @@ setup(
     packages=[
         'noisecut'],
     install_requires=[
-        'numpy<=2.21',
+        'numpy<=1.21',
         'matplotlib',
         'obspy',
         'librosa',
