@@ -26,7 +26,7 @@ def _valid_win_length_samples(win_length_samples, win_length, sampling_rate):
     elif win_length_samples is None and win_length is not None:
         win_length_samples = _next_pow2(win_length*sampling_rate)
 
-    elif win_length_samples is not None and win_length_samples is not None:
+    elif win_length_samples is not None and win_length is not None:
         raise ValueError(
             'Parameters win_length and win_length_samples are mutually '
             'exclusive.')
