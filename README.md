@@ -1,5 +1,6 @@
 # NoiseCut
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.7339551.svg)](https://doi.org/10.5281/zenodo.7339551)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL_v3-blue.svg)](LICENSE)
 
 NoiseCut is a Python package for denoising seismic records and specializes in denoising Ocean Bottom Seismometer (OBS) data. It effectively separates long-lasting narrowband signals from broadband transients using harmonic-percussive separation algorithms (Zali et al., 2021 & Zali et al., 2023). The advantage of NoiseCut is that it preserves the earthquake signal with its entire frequency and amplitude after denoising.
 
@@ -52,4 +53,4 @@ NoiseCut is licenced under the [GNU Affero General Public License
 
 ## Contact
 
-* Developer: Zahra Zali, zali@gfz-potsdam.de
+* Developer: Zahra Zali, zali@gfz.de
