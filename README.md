@@ -6,10 +6,20 @@ NoiseCut is a Python package for denoising seismic records and specializes in de
 ![example](https://user-images.githubusercontent.com/50201021/235652233-33ce7bdc-d717-4a9b-bef9-05bb524026ff.png)
 
 
-## Links
-Paper: https://se.copernicus.org/articles/14/181/2023/se-14-181-2023.pdf
+## Citations and Links
 
-Paper: https://pubs.geoscienceworld.org/ssa/srl/article/92/6/3668/606262/Volcanic-Tremor-Extraction-and-Earthquake
+When using this package, please cite the following works:
+
+1. **Zali, Z., Rein, T., Krüger, F., Ohrnberger, M., & Scherbaum, F.** (2023).  
+   *Ocean bottom seismometer (OBS) noise reduction from horizontal and vertical components using harmonic–percussive separation algorithms.*  
+   *Solid Earth, 14*(2), 181–195.  
+   [https://doi.org/10.5194/se-14-181-2023](https://doi.org/10.5194/se-14-181-2023)  
+
+2. **Zali, Z., Ohrnberger, M., Scherbaum, F., Cotton, F., & Eibl, E. P.** (2021).  
+   *Volcanic tremor extraction and earthquake detection using music information retrieval algorithms.*  
+   *Seismological Research Letters, 92*(6), 3668–3681.  
+   [https://doi.org/10.1785/0220210016](https://doi.org/10.1785/0220210016)  
+
 
 ## Usage example
 After installing the package to denoise a signal, you can use the following code. Outputs are the denoised signal and a figure showing the spectrogram of the input signal, the separated noise, and the denoised signal in the frequency range of [0-1] Hz.
